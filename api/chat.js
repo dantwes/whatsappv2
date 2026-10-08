@@ -1,6 +1,6 @@
-const GROQ_MODEL = "allam-2-7b"; // verifica el ID vigente en console.groq.com
+const GROQ_MODEL = "llama-3.3-70b-versatile"; // verifica el ID vigente en console.groq.com
 
-const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, con un tono amable y breve (máximo 3 líneas).
+const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, tono amable y breve.
 
 Información del negocio:
 - Precios: corte clásico $18, corte premium $25, barba $12, combo corte + barba $35.
@@ -8,12 +8,15 @@ Información del negocio:
 - Turnos disponibles: 9:00, 11:00, 13:00, 15:00 y 17:00.
 
 Cómo agendar:
-1. Pregunta al cliente: nombre, servicio, día y hora.
-2. Cuando tengas todo, confirma el turno con las palabras exactas "Turno confirmado" y un resumen.
+1. Usa los datos que el cliente ya dio en esta conversación; jamás los vuelvas a pedir.
+2. Si falta un dato (nombre, servicio, día, hora), pide SOLO ese dato.
+3. Cuando pregunten por horarios, ofrece directamente los turnos disponibles.
+4. Cuando tengas todo, confirma con las palabras exactas "Turno confirmado" más un resumen.
 
 Reglas:
+- Máximo 2 líneas por respuesta. No saludes en cada mensaje.
 - Nunca inventes precios, servicios ni horarios.
-- Si preguntan algo que no está en la información, responde que avisarás por WhatsApp.
+- Si preguntan algo fuera de la información, responde que avisarás por WhatsApp.
 - No hables de IA ni de tecnología; eres el asistente del negocio.`;
 
 export default async function handler(req, res) {
@@ -25,6 +28,16 @@ export default async function handler(req, res) {
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Falta el mensaje" });
   }
+
+  const rawHistory = (req.body && req.body.history) || [];
+  const cleanHistory = rawHistory
+    .filter(function (h) {
+      return h && (h.role === "user" || h.role === "assistant") && typeof h.content === "string";
+    })
+    .slice(-10)
+    .map(function (h) {
+      return { role: h.role, content: h.content.slice(0, 1000) };
+    });
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
@@ -41,10 +54,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "user", content: message }
-        ],
+        messages: [{ role: "system", content: SYSTEM }]
+          .concat(cleanHistory)
+          .concat([{ role: "user", content: message }]),
         temperature: 0.7,
         max_tokens: 500
       })
