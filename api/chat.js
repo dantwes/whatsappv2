@@ -1,7 +1,4 @@
-// Función serverless de Vercel: recibe el mensaje del chat y responde con Gemini.
-// La clave de API vive en la variable de entorno GEMINI_API_KEY (nunca en el código).
-
-const GROQ_MODEL = "allam-2-7b"; // si da error, cambia a "gemini-1.5-flash"
+const GROQ_MODEL = "llama-3.3-70b-versatile"; // verifica el ID vigente en console.groq.com
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, con un tono amable y breve (máximo 3 líneas).
 
@@ -29,7 +26,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Falta el mensaje" });
   }
 
-    const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     console.error("Falta la variable de entorno GROQ_API_KEY");
     return res.status(500).json({ error: "Configuración incompleta del servidor" });
@@ -55,21 +52,19 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const detail = await response.text();
-      console.error("Error de Gemini:", response.status, detail);
+      console.error("Error de Groq:", response.status, detail);
       return res.status(502).json({ error: "El modelo de IA no respondió" });
     }
 
     const data = await response.json();
     const reply =
-      data.candidates &&
-      data.candidates[0] &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts
-        .map(function (p) { return p.text; })
-        .join("");
+      data.choices &&
+      data.choices[0] &&
+      data.choices[0].message &&
+      data.choices[0].message.content;
 
     return res.status(200).json({
-      reply: reply || "Perdón, no entendí. ¿Quieres ver precios o agendar un turno?"
+      reply: (reply && reply.trim()) || "Perdón, no entendí. ¿Quieres ver precios o agendar un turno?"
     });
   } catch (err) {
     console.error(err);
