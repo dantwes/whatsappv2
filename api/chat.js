@@ -1,7 +1,7 @@
 // Función serverless de Vercel: recibe el mensaje del chat y responde con Gemini.
 // La clave de API vive en la variable de entorno GEMINI_API_KEY (nunca en el código).
 
-const GEMINI_MODEL = "meta-llama/llama-prompt-guard-2-22m"; // si da error, cambia a "gemini-1.5-flash"
+const GROQ_MODEL = "allam-2-7b"; // si da error, cambia a "gemini-1.5-flash"
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, con un tono amable y breve (máximo 3 líneas).
 
