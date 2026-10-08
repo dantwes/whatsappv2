@@ -1,7 +1,7 @@
 // Función serverless de Vercel: recibe el mensaje del chat y responde con Gemini.
 // La clave de API vive en la variable de entorno GEMINI_API_KEY (nunca en el código).
 
-const GEMINI_MODEL = "gemini-3.8-flash"; // si da error, cambia a "gemini-1.5-flash"
+const GEMINI_MODEL = "meta-llama/llama-prompt-guard-2-22m"; // si da error, cambia a "gemini-1.5-flash"
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, con un tono amable y breve (máximo 3 líneas).
 
@@ -29,24 +29,29 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Falta el mensaje" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    console.error("Falta la variable de entorno GEMINI_API_KEY");
+    console.error("Falta la variable de entorno GROQ_API_KEY");
     return res.status(500).json({ error: "Configuración incompleta del servidor" });
   }
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { role: "model", parts: [{ text: SYSTEM }] },
-          contents: [{ role: "user", parts: [{ text: message }] }]
-        })
-      }
-    );
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: message }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
 
     if (!response.ok) {
       const detail = await response.text();
