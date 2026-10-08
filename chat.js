@@ -1,4 +1,3 @@
-// Chat widget — se comunica con /api/chat (función serverless de Vercel)
 (function () {
   var btn = document.getElementById("waChatBtn");
   var panel = document.getElementById("waPanel");
@@ -6,6 +5,10 @@
   var form = document.getElementById("waForm");
   var input = document.getElementById("waInput");
   var messages = document.getElementById("waMessages");
+
+  var history = []; // memoria: {role: "user"|"assistant", content: "..."}
+
+  var GREETING = "¡Hola! Soy el asistente de La Barbería. Puedo darte precios, horarios o agendar un turno. ¿En qué te ayudo?";
 
   function addMsg(text, who) {
     var div = document.createElement("div");
@@ -38,13 +41,14 @@
     if (!text) return;
 
     addMsg(text, "user");
+    history.push({ role: "user", content: text });
     input.value = "";
     var typing = addTyping();
 
     fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({ message: text, history: history.slice(-10) })
     })
       .then(function (res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -52,7 +56,9 @@
       })
       .then(function (data) {
         typing.remove();
-        addMsg(data.reply || "Perdón, no pude responder. ¿Quieres ver precios o agendar un turno?", "bot");
+        var reply = data.reply || "Perdón, no pude responder. ¿Quieres ver precios o agendar un turno?";
+        addMsg(reply, "bot");
+        history.push({ role: "assistant", content: reply });
       })
       .catch(function () {
         typing.remove();
@@ -60,9 +66,6 @@
       });
   });
 
-  // Saludo inicial
-  addMsg(
-    "¡Hola! Soy el asistente de La Barbería. Puedo darte precios, horarios o agendar un turno. ¿En qué te ayudo?",
-    "bot"
-  );
+  addMsg(GREETING, "bot");
+  history.push({ role: "assistant", content: GREETING });
 })();
