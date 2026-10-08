@@ -1,4 +1,4 @@
-const GROQ_MODEL = "qwen/qwen3.8-27b"; // verifica el ID vigente en console.groq.com
+const GROQ_MODEL = "qwen/qwen3.8-27b"; 
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, tono amable y breve.
 
