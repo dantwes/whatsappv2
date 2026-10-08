@@ -1,4 +1,4 @@
-const GROQ_MODEL = "llama-3.3-70b-versatile"; // verifica el ID vigente en console.groq.com
+const GROQ_MODEL = "allam-2-7b"; // verifica el ID vigente en console.groq.com
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, con un tono amable y breve (máximo 3 líneas).
 
