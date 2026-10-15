@@ -6,7 +6,7 @@ Stack: HTML, CSS y JavaScript; API serverless en Vercel; API del proveedor LLM v
 Aprendizaje clave: product-market fit importa más que tener un chatbot genérico, incluso cuando la implementación técnica es sólida.
 
 ---El trabajo queda archivado como evidencia de análisis de mercado, criterios técnicos y decisiones de producto---
-                                                             (Sigo buscando opciones)
+                                                           
 
 
 ![Login](hero-wb.png)
