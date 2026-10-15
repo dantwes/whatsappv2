@@ -9,4 +9,4 @@ Aprendizaje clave: product-market fit importa más que tener un chatbot genéric
                                                              (Sigo buscando opciones)
 
 
-![Login](hero.png)
+![Login](hero-wb.png)
