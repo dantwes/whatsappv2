@@ -1,3 +1,7 @@
+//Demo esto se ponia en la landing page para darle al usuario una nocion de lo que haria use GROQ por la api gratis probe diferentes llm//
+//qwen 3.8-27b es muy inpresionante para ser de pesos abiertos//
+//no soy tonto la api esta en vercel (mi cuenta)//
+
 const GROQ_MODEL = "qwen/qwen3.8-27b"; 
 
 const SYSTEM = `Eres el asistente virtual de "La Barbería". Responde siempre en español, tono amable y breve.
